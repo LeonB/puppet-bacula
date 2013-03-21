@@ -1,0 +1,249 @@
+# MANAGED BY PUPPET!
+# modules/bacula/templates/bacula-dir.conf.erb
+# Changes WILL BE overwritten! Any permanent changes must be checked
+# into git.
+
+#
+# Default Bacula Director Configuration file
+#
+#  The only thing that MUST be changed is to add one or more
+#   file or directory names in the Include directive of the
+#   FileSet resource.
+#
+#  For Bacula release 5.2.5 (26 January 2012) -- ubuntu 12.04
+#
+#  You might also want to change the default email address
+#   from root to your address.  See the "mail" and "operator"
+#   directives in the Messages resource.
+#
+
+Director {                            # define myself
+  Name = <%= @hostname %>-dir
+  DIRport = 9101                # where we listen for UA connections
+  QueryFile = "/etc/bacula/scripts/query.sql"
+  WorkingDirectory = "/var/lib/bacula"
+  PidDirectory = "/var/run/bacula"
+  Maximum Concurrent Jobs = 1
+  Password = "<%= scope.lookupvar('bacula::director::console_password') %>"         # Console password
+  Messages = Daemon
+  DirAddress = 127.0.0.1
+}
+
+JobDefs {
+  Name = "DefaultJob"
+  Type = Backup
+  Level = Incremental
+  Schedule = "WeeklyCycle"
+  Storage = <%= @hostname %>-sd
+  Messages = Standard
+  Pool = Default
+  Priority = 10
+  Write Bootstrap = "/var/lib/bacula/%c.bsr"
+}
+
+# Backup the catalog database (after the nightly save)
+Job {
+  Name = "BackupCatalog"
+  Client = "<%= @fqdn %>"
+  JobDefs = "DefaultJob"
+  Level = Full
+  FileSet="Catalog"
+  Schedule = "WeeklyCycleAfterBackup"
+  # This creates an ASCII copy of the catalog
+  # Arguments to make_catalog_backup.pl are:
+  #  make_catalog_backup.pl <catalog-name>
+  RunBeforeJob = "/etc/bacula/scripts/make_catalog_backup.pl MyCatalog"
+  # This deletes the copy of the catalog
+  RunAfterJob  = "/etc/bacula/scripts/delete_catalog_backup"
+  Write Bootstrap = "/var/lib/bacula/%n.bsr"
+  Priority = 11                   # run after main backup
+}
+
+#
+# Standard Restore template, to be changed by Console program
+#  Only one such job is needed for all Jobs/Clients/Storage ...
+#
+Job {
+  Name = "RestoreFiles"
+  Client = "<%= @fqdn %>"
+  Type = Restore
+  FileSet="Server"
+  Storage = <%= @hostname %>-sd
+  Pool = Default
+  Messages = Standard
+  Where = /tmp/bacula
+}
+
+#
+# List of files to be backed up
+# NO trailing slash: this will fuck things up
+#
+FileSet {
+  Name = "Server"
+  Include {
+    Options {
+      Exclude = yes
+      Ignore Case = yes
+
+      # All exact matches (case insensitive) of global files to ignore
+      RegexDir  = "/\.sass\-cache$"
+      RegexFile = "/\.ds_store$"
+      RegexFile = "/desktop\.ini$"
+      RegexFile = "/thumbs\.db$"
+    }
+
+    Options {
+      signature   = MD5
+      compression = GZIP #Compress Incoming Data on the client
+      noatime = yes
+    }
+
+    File = /etc
+    File = /home
+    File = /lib/ufw
+    File = /var/backups
+    File = /var/lib/puppet
+    File = /var/spool/cron
+  }
+
+  Exclude {
+    File = "/etc/apparmor.d/cache"
+    File = "/home/*/.cache"
+    File = "/home/*/.codeintel"
+    File = "/home/*/.gvfs"
+    File = "/home/*/.local/share/pear/cache"
+    File = "/home/*/.local/share/Trash"
+    File = "/home/*/.mozilla/firefox/*/Cache"
+    File = "/home/*/.mutt/cache"
+    File = "/home/*/.pdepend"
+    File = "/home/*/.PyCharm20"
+    File = "/home/*/.thumbnails"
+    File = "/home/*/.thunderbird/*/Cache"
+    File = "/home/*/.ubuntuone/Purchased from Ubuntu One"
+    File = "/home/*/.WebIde40"
+    File = "/home/*/Desktop"
+    File = "/home/*/Downloads"
+    File = "/home/*/Music"
+    File = "/home/*/src"
+    File = "/home/.ecryptfs"
+    File = "/home/tmp"
+  }
+}
+
+#
+# When to do the backups, full backup on first sunday of the month,
+#  differential (i.e. incremental since full) every other sunday,
+#  and incremental backups other days
+Schedule {
+  Name = "WeeklyCycle"
+  Run = Full 1st sun at 23:05
+  Run = Differential 2nd-5th sun at 23:05
+  Run = Incremental mon-sat at 23:05
+}
+
+# This schedule does the catalog. It starts after the WeeklyCycle
+Schedule {
+  Name = "WeeklyCycleAfterBackup"
+  Run = Full sun-sat at 23:10
+}
+
+# This is the backup of the catalog
+FileSet {
+  Name = "Catalog"
+  Include {
+    Options {
+      signature = MD5
+    }
+    File = "/var/lib/bacula/bacula.sql"
+  }
+}
+
+# Definition of file storage device
+Storage {
+  Name = <%= @hostname %>-sd
+  Address = "<%= @fqdn %>" # N.B. Use a fully qualified name here
+  SDPort = 9103
+  Password = "<%= scope.lookupvar('bacula::director::storage_password') %>"
+  Device = FileStorage
+  Media Type = File
+}
+
+# Generic catalog service
+Catalog {
+  Name = MyCatalog
+  dbname = "<%= scope.lookupvar('bacula::director::db_name') %>"; DB Address = "<%= scope.lookupvar('bacula::director::db_address') %>"; dbuser = "<%= scope.lookupvar('bacula::director::db_user') %>"; dbpassword = "<%= scope.lookupvar('bacula::director::db_password') %>"
+}
+
+# Reasonable message delivery -- send most everything to email address
+#  and to the console
+Messages {
+  Name = Standard
+#
+# NOTE! If you send to two email or more email addresses, you will need
+#  to replace the %r in the from field (-f part) with a single valid
+#  email address in both the mailcommand and the operatorcommand.
+#  What this does is, it sets the email address that emails would display
+#  in the FROM field, which is by default the same email as they're being
+#  sent to.  However, if you send email to more than one address, then
+#  you'll have to set the FROM address manually, to a single address.
+#  for example, a 'no-reply@mydomain.com', is better since that tends to
+#  tell (most) people that its coming from an automated source.
+
+#
+  mailcommand = "/usr/lib/bacula/bsmtp -h localhost -f \"\(Bacula\) \<%%r\>\" -s \"Bacula: %t %e of %c %l\" %r"
+  operatorcommand = "/usr/lib/bacula/bsmtp -h localhost -f \"\(Bacula\) \<%%r\>\" -s \"Bacula: Intervention needed for %j\" %r"
+  mail = <%= scope.lookupvar('bacula::director::mail_from') %> = all, !skipped, !info
+  mail on error = <%= scope.lookupvar('bacula::director::mail_from') %> = all, !skipped
+  operator = <%= scope.lookupvar('bacula::director::mail_to') %> = mount
+  console = all, !skipped, !saved
+#
+# WARNING! the following will create a file that you must cycle from
+#          time to time as it will grow indefinitely. However, it will
+#          also keep all your messages if they scroll off the console.
+#
+  append = "/var/lib/bacula/log" = all, !skipped
+  catalog = all
+}
+
+
+#
+# Message delivery for daemon messages (no job).
+Messages {
+  Name = Daemon
+  mailcommand = "/usr/lib/bacula/bsmtp -h localhost -f \"\(Bacula\) \<%%r\>\" -s \"Bacula daemon message\" %r"
+  mail = root@localhost = all, !skipped
+  console = all, !skipped, !saved
+  append = "/var/lib/bacula/log" = all, !skipped
+}
+
+# File Pool definition
+Pool {
+  Name = Default
+  Pool Type = Backup
+  Recycle = yes                       # Bacula can automatically recycle Volumes
+  AutoPrune = yes                     # Prune expired volumes
+  Volume Retention = 365 days         # one year
+  Maximum Volume Bytes = 50G          # Limit Volume size to something reasonable
+  Maximum Volumes = 100               # Limit number of Volumes in Pool
+  LabelFormat = "Vol"
+}
+
+
+# Scratch pool definition
+Pool {
+  Name = Scratch
+  Pool Type = Backup
+}
+
+#
+# Restricted console used by tray-monitor to get the status of the director
+#
+# Console {
+#   Name = <%= @hostname %>-mon
+#   Password = "xiU74zLgz3ZxiQ2-_MLM4x6SUDZOJu-af"
+#   CommandACL = status, .status
+# }
+
+# Finally, bring in all the additional pieces of configuration from the
+# different servers for which this Director was configured to manage
+@|"sh -c 'for f in /etc/bacula/bacula-dir.d/*.conf ; do echo @${f} ; done'"

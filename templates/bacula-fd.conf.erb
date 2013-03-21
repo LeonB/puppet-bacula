@@ -1,0 +1,39 @@
+# MANAGED BY PUPPET!
+# modules/bacula/templates/bacula-fd.conf.erb
+# Changes WILL BE overwritten! Any permanent changes must be checked
+# into git.
+
+#
+# Default  Bacula File Daemon Configuration file
+#
+#  For Bacula release 5.2.5 (26 January 2012) -- ubuntu 12.04
+#
+# There is not much to change here except perhaps the
+# File daemon Name to
+#
+
+#
+# List Directors who are permitted to contact this File daemon
+#
+Director {
+  Name = <%= @hostname %>-dir
+  Password = "<%= scope.lookupvar('bacula::client::password') %>"
+}
+
+#
+# "Global" File daemon configuration specifications
+#
+FileDaemon {                          # this is me
+  Name = <%= @fqdn %>
+  FDport = 9102                  # where we listen for the director
+  WorkingDirectory = /var/lib/bacula
+  Pid Directory = /var/run/bacula
+  Maximum Concurrent Jobs = 20
+  FDAddress = 0.0.0.0
+}
+
+# Send all messages except skipped files back to Director
+Messages {
+  Name = Standard
+  director = <%= @hostname %>-dir = all, !skipped, !restored
+}

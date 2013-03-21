@@ -1,0 +1,24 @@
+# MANAGED BY PUPPET!
+# modules/bacula/templates/client_config.erb
+# Changes WILL BE overwritten! Any permanent changes must be checked
+# into git.
+
+Client {
+	Name                = "<%= name %>"
+	Address             = "<%= name %>"
+	Password            = "<%= password %>"
+	Catalog             = "MyCatalog"
+	File Retention      = 6 Weeks
+	Job Retention       = 6 months
+	Auto Prune          = yes
+}
+
+Job {
+	Name                = "<%= name %>"
+	Client              = "<%= name %>"
+	JobDefs             = "DefaultJob"
+	FileSet             = "<%= fileset %>"
+	Reschedule On Error = yes
+	Reschedule Interval = 1 hours
+	Reschedule Times    = 10
+}
