@@ -20,6 +20,8 @@ class bacula::director::params {
 		default => 'bacula-director-mysql'
 	}
 
+	$enabled = true
+
 	$mail_from   = 'root@localhost'
 	$mail_to     = 'root@localhost'
 	$db_name     = 'bacula'
