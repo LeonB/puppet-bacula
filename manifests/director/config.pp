@@ -1,4 +1,4 @@
-class bacula::director::config {
+class bacula::director::config inherits bacula::config {
 
 	file { '/etc/bacula/bacula-dir.conf':
         ensure  => $bacula::director::ensure,

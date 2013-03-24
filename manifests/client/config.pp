@@ -1,4 +1,4 @@
-class bacula::client::config {
+class bacula::client::config inherits bacula::config {
 
 	file { '/etc/bacula/bacula-fd.conf':
         ensure  => present,

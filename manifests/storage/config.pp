@@ -1,4 +1,4 @@
-class bacula::storage::config {
+class bacula::storage::config inherits bacula::config {
 
     file { '/etc/bacula/bacula-sd.conf':
         ensure  => present,
