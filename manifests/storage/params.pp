@@ -20,4 +20,6 @@ class bacula::storage::params {
 		default => 'bacula-sd'
 	}
 
+	$director_server = $::fqdn
+
 }

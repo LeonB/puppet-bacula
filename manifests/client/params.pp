@@ -20,4 +20,6 @@ class bacula::client::params {
 		default => 'bacula-fd'
 	}
 
+	$director_server = $::fqdn
+
 }

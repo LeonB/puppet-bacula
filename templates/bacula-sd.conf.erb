@@ -16,7 +16,7 @@
 #
 
 Storage {                             # definition of myself
-  Name = <%= @hostname %>-sd
+  Name = <%= @fqdn %>-sd
   SDPort = 9103                  # Director's port
   WorkingDirectory = "/var/lib/bacula"
   Pid Directory = "/run/bacula"
@@ -28,7 +28,7 @@ Storage {                             # definition of myself
 # List Directors who are permitted to contact Storage daemon
 #
 Director {
-  Name = <%= @hostname %>-dir
+  Name = <%= scope.lookupvar('bacula::storage::director_server') %>-dir
   Password = "<%= scope.lookupvar('bacula::storage::password') %>"
 }
 
@@ -37,7 +37,7 @@ Director {
 #   status of the storage daemon
 #
 Director {
-  Name = <%= @hostname %>-mon
+  Name = <%= scope.lookupvar('bacula::storage::director_server') %>-mon
   Password = "Ukdn_d5j9eHhqMjXTWHtvWuxYq4F_-F69"
   Monitor = yes
 }
@@ -213,5 +213,5 @@ Device {
 #
 Messages {
   Name = Standard
-  director = <%= @hostname %>-dir = all
+  director = <%= scope.lookupvar('bacula::storage::director_server') %>-dir = all
 }

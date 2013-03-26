@@ -18,7 +18,7 @@
 #
 
 Director {                            # define myself
-  Name = <%= @hostname %>-dir
+  Name = <%= @fqdn %>-dir
   DIRport = 9101                # where we listen for UA connections
   QueryFile = "/etc/bacula/scripts/query.sql"
   WorkingDirectory = "/var/lib/bacula"
@@ -34,7 +34,7 @@ JobDefs {
   Type = Backup
   Level = Incremental
   Schedule = "WeeklyCycle"
-  Storage = <%= @hostname %>-sd
+  Storage = <%= @storage_server %>-sd
   Messages = Standard
   Pool = Default
   Priority = 10
@@ -68,7 +68,7 @@ Job {
   Client = "<%= @fqdn %>"
   Type = Restore
   FileSet="Server"
-  Storage = <%= @hostname %>-sd
+  Storage = <%= @storage_server %>-sd
   Pool = Default
   Messages = Standard
   Where = /tmp/bacula
@@ -160,8 +160,8 @@ FileSet {
 
 # Definition of file storage device
 Storage {
-  Name = <%= @hostname %>-sd
-  Address = "<%= @fqdn %>" # N.B. Use a fully qualified name here
+  Name = <%= @storage_server %>-sd
+  Address = "<%= @storage_server %>" # N.B. Use a fully qualified name here
   SDPort = 9103
   Password = "<%= scope.lookupvar('bacula::director::storage_password') %>"
   Device = FileStorage
@@ -239,7 +239,7 @@ Pool {
 # Restricted console used by tray-monitor to get the status of the director
 #
 # Console {
-#   Name = <%= @hostname %>-mon
+#   Name = <%= @fqdn %>-mon
 #   Password = "xiU74zLgz3ZxiQ2-_MLM4x6SUDZOJu-af"
 #   CommandACL = status, .status
 # }

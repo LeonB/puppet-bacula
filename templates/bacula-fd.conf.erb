@@ -16,7 +16,7 @@
 # List Directors who are permitted to contact this File daemon
 #
 Director {
-  Name = <%= @hostname %>-dir
+  Name = <%= scope.lookupvar('bacula::client::director_server') %>-dir
   Password = "<%= scope.lookupvar('bacula::client::password') %>"
 }
 
@@ -35,5 +35,5 @@ FileDaemon {                          # this is me
 # Send all messages except skipped files back to Director
 Messages {
   Name = Standard
-  director = <%= @hostname %>-dir = all, !skipped, !restored
+  director = <%= scope.lookupvar('bacula::client::director_server') %>-dir = all, !skipped, !restored
 }

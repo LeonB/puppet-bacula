@@ -10,6 +10,7 @@ class bacula::director(
 	$db_address       = params_lookup( 'db_address' ),
 	$db_user          = params_lookup( 'db_user' ),
 	$db_password      = params_lookup( 'db_password' ),
+	$storage_server   = params_lookup( 'storage_server' ),
 ) inherits bacula::director::params {
 
   	$ensure = $enabled ? {

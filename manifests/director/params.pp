@@ -22,11 +22,12 @@ class bacula::director::params {
 
 	$enabled = true
 
-	$mail_from   = 'root@localhost'
-	$mail_to     = 'root@localhost'
-	$db_name     = 'bacula'
-	$db_address  = 'localhost'
-	$db_user     = 'root'
-	$db_password = undef
+	$mail_from      = 'root@localhost'
+	$mail_to        = 'root@localhost'
+	$db_name        = 'bacula'
+	$db_address     = 'localhost'
+	$db_user        = 'root'
+	$db_password    = undef
+	$storage_server = $::fqdn
 
 }
