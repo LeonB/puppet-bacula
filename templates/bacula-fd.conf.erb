@@ -48,15 +48,3 @@ Messages {
   Name = Standard
   director = <%= scope.lookupvar('bacula::client::director_server') %>-dir = all, !skipped, !restored
 }
-
-<% if scope.lookupvar('bacula::director::monitor_password') != '' -%>
-#
-# Restricted Director, used by tray-monitor to get the
-#   status of the storage daemon
-#
-Director {
-  Name = <%= scope.lookupvar('bacula::storage::monitor_password') %>-mon
-  Password = "Ukdn_d5j9eHhqMjXTWHtvWuxYq4F_-F69"
-  Monitor = yes
-}
-<% end -%>
