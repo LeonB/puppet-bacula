@@ -1,0 +1,4 @@
+FSPASSWD=<%= scope.lookupvar('bacula::storage::password') %>
+<% if scope.lookupvar('bacula::director::storage') != '' -%>
+FSMPASSWD=<%= scope.lookupvar('bacula::storage::monitor_password') %>
+<% end -%>

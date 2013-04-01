@@ -17,5 +17,6 @@ class bacula::params {
 	### Application related parameters
 
 	$user = 'bacula'
+	$monitor_password = ''
 
 }

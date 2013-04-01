@@ -1,0 +1,4 @@
+DIRPASSWD=<%= scope.lookupvar('bacula::director::password') %>
+<% if scope.lookupvar('bacula::director::monitor_password') != '' -%>
+DIRMPASSWD=<%= scope.lookupvar('bacula::director::monitor_password') %>
+<% end -%>

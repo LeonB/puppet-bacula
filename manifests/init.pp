@@ -1,5 +1,5 @@
 class bacula(
-	$user = params_lookup( 'user' ),
+	$user             = params_lookup( 'user' ),
 ) inherits bacula::params {
 
 	include bacula::config

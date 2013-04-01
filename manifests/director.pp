@@ -2,8 +2,9 @@ class bacula::director(
 	$package_name     = params_lookup( 'package_name' ),
 	$enabled          = params_lookup( 'enabled' ),
 
-	$console_password = params_lookup( 'console_password' ),
+	$password         = params_lookup( 'password' ),
 	$storage_password = params_lookup( 'storage_password' ),
+	$monitor_password = params_lookup( 'monitor_password' ),
 	$mail_to          = params_lookup( 'mail_from' ),
 	$mail_from        = params_lookup( 'mail_to' ),
 	$db_name          = params_lookup( 'db_name' ),

@@ -7,17 +7,16 @@ class bacula::director::config inherits bacula::config {
         notify  => Class['bacula::director::service']
 	}
 
-        file {
+    file {
 		[
 			'/etc/bacula/scripts/btraceback.gdb',
-			'/etc/bacula/scripts/mtx-changer.conf',
 			'/etc/bacula/scripts/query.sql',
 		]:
-                	ensure  => $bacula::director::ensure,
-	                owner   => root,
-	                group   => bacula,
-	                mode    => 0640; # rw,r
-        }
+	    	ensure  => $bacula::director::ensure,
+	        owner   => root,
+	        group   => bacula,
+	        mode    => 0640; # rw,r
+    }
 
 	file { '/etc/bacula/bacula-dir.d/':
 		ensure  => $bacula::director::ensure ? { present => directory, default => $ensure },
@@ -27,6 +26,13 @@ class bacula::director::config inherits bacula::config {
 		group   => bacula,
 		mode    => 0640; # rw,r,r
 	}
+
+	# debian specific
+    concat::fragment { '/etc/bacula/common_default_passwords.director':
+        target  => '/etc/bacula/common_default_passwords',
+        content => template('bacula/common_default_passwords/director.erb'),
+        order   => 2,
+    }
 
 	# collect exported resources
 	Bacula::Director::Client <<||>>

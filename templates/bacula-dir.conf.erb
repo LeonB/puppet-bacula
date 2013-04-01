@@ -24,7 +24,7 @@ Director {                            # define myself
   WorkingDirectory = "/var/lib/bacula"
   PidDirectory = "/var/run/bacula"
   Maximum Concurrent Jobs = 1
-  Password = "<%= scope.lookupvar('bacula::director::console_password') %>"         # Console password
+  Password = "<%= scope.lookupvar('bacula::director::password') %>"         # Console password
   Messages = Daemon
   DirAddress = 127.0.0.1
 }
@@ -34,7 +34,7 @@ JobDefs {
   Type = Backup
   Level = Incremental
   Schedule = "WeeklyCycle"
-  Storage = <%= @storage_server %>-sd
+  Storage = <%= scope.lookupvar('bacula::director::storage_server') %>-sd
   Messages = Standard
   Pool = Default
   Priority = 10
@@ -68,7 +68,7 @@ Job {
   Client = "<%= @fqdn %>"
   Type = Restore
   FileSet="Server"
-  Storage = <%= @storage_server %>-sd
+  Storage = <%= scope.lookupvar('bacula::director::storage_server') %>-sd
   Pool = Default
   Messages = Standard
   Where = /tmp/bacula
@@ -160,8 +160,8 @@ FileSet {
 
 # Definition of file storage device
 Storage {
-  Name = <%= @storage_server %>-sd
-  Address = "<%= @storage_server %>" # N.B. Use a fully qualified name here
+  Name = <%= scope.lookupvar('bacula::director::storage_server') %>-sd
+  Address = "<%= scope.lookupvar('bacula::director::storage_server') %>" # N.B. Use a fully qualified name here
   SDPort = 9103
   Password = "<%= scope.lookupvar('bacula::director::storage_password') %>"
   Device = FileStorage
@@ -235,15 +235,17 @@ Pool {
   Pool Type = Backup
 }
 
+<% if scope.lookupvar('bacula::director::monitor_password') != '' -%>
 #
 # Restricted console used by tray-monitor to get the status of the director
 #
 # Console {
 #   Name = <%= @fqdn %>-mon
-#   Password = "xiU74zLgz3ZxiQ2-_MLM4x6SUDZOJu-af"
+#   Password = "<%= scope.lookupvar('bacula::director::monitor_password') %>"
 #   CommandACL = status, .status
 # }
 
+<% end -%>
 # Finally, bring in all the additional pieces of configuration from the
 # different servers for which this Director was configured to manage
 @|"sh -c 'for f in /etc/bacula/bacula-dir.d/*.conf ; do echo @${f} ; done'"

@@ -1,0 +1,4 @@
+FDPASSWD=<%= scope.lookupvar('bacula::client::password') %>
+<% if scope.lookupvar('bacula::client::monitor_password') != '' -%>
+FDMPASSWD=<%= scope.lookupvar('bacula::client::monitor_password') %>
+<% end -%>
