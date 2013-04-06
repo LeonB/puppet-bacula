@@ -20,7 +20,7 @@ class bacula::config {
     }
 
 	users::account { $bacula::user:
-	    ensure  => $sabnzbdplus::ensure,
+	    ensure  => $bacula::ensure,
 	    uid     => 120,
 	    home    => '/var/lib/bacula',
 	    shell   => '/bin/false',
