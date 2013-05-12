@@ -21,7 +21,7 @@ class bacula::config {
 
 	users::account { $bacula::user:
 	    ensure  => $bacula::ensure,
-	    uid     => 120,
+	    uid     => 160,
 	    home    => '/var/lib/bacula',
 	    shell   => '/bin/false',
 	    comment => 'Bacula',
