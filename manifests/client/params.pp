@@ -14,12 +14,12 @@
 #
 class bacula::client::params {
 
-	### Application related parameters
+  ### Application related parameters
 
-	$package_name = $::operatingsystem ? {
-		default => 'bacula-fd'
-	}
+  $package_name = $::operatingsystem ? {
+    default => 'bacula-fd'
+  }
 
-	$director_server = $::fqdn
+  $director_server = $::fqdn
 
 }

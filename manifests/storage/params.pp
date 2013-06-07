@@ -14,12 +14,12 @@
 #
 class bacula::storage::params {
 
-	### Application related parameters
+  ### Application related parameters
 
-	$package_name = $::operatingsystem ? {
-		default => 'bacula-sd'
-	}
+  $package_name = $::operatingsystem ? {
+    default => 'bacula-sd'
+  }
 
-	$director_server = $::fqdn
+  $director_server = $::fqdn
 
 }

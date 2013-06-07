@@ -14,20 +14,20 @@
 #
 class bacula::director::params {
 
-	### Application related parameters
+  ### Application related parameters
 
-	$package_name = $::operatingsystem ? {
-		default => 'bacula-director-mysql'
-	}
+  $package_name = $::operatingsystem ? {
+    default => 'bacula-director-mysql'
+  }
 
-	$enabled = true
+  $enabled = true
 
-	$mail_from      = 'root@localhost'
-	$mail_to        = 'root@localhost'
-	$db_name        = 'bacula'
-	$db_address     = 'localhost'
-	$db_user        = 'root'
-	$db_password    = undef
-	$storage_server = $::fqdn
+  $mail_from      = 'root@localhost'
+  $mail_to        = 'root@localhost'
+  $db_name        = 'bacula'
+  $db_address     = 'localhost'
+  $db_user        = 'root'
+  $db_password    = undef
+  $storage_server = $::fqdn
 
 }

@@ -1,31 +1,36 @@
 class bacula::config {
-	include bacula
+  include bacula
+
+  $directory_ensure = $bacula::ensure ? {
+    present => directory,
+    default => $bacula::ensure
+  }
 
     file { '/etc/bacula/':
-            ensure  => $bacula::ensure ? { present => directory, default => $ensure },
-            force   => true,
-            recurse => true,
-            owner   => root,
-            group   => bacula,
-            mode    => 0640; # rw,r
+      ensure  => $directory_ensure,
+      force   => true,
+      recurse => true,
+      owner   => root,
+      group   => bacula,
+      mode    => '0640'; # rw,r
     }
 
     file { '/etc/bacula/scripts/':
-            ensure  => $bacula::ensure ? { present => directory, default => $ensure },
-            force   => true,
-            recurse => true,
-            owner   => root,
-            group   => bacula,
-            mode    => 0750; # rwx,rx
+      ensure  => $directory_ensure,
+      force   => true,
+      recurse => true,
+      owner   => root,
+      group   => bacula,
+      mode    => '0750'; # rwx,rx
     }
 
-	users::account { $bacula::user:
-	    ensure  => $bacula::ensure,
-	    uid     => 160,
-	    home    => '/var/lib/bacula',
-	    shell   => '/bin/false',
-	    comment => 'Bacula',
-	}
+  users::account { $bacula::user:
+      ensure  => $bacula::ensure,
+      uid     => 160,
+      home    => '/var/lib/bacula',
+      shell   => '/bin/false',
+      comment => 'Bacula',
+  }
 
     # debian specific
     concat { '/etc/bacula/common_default_passwords':
