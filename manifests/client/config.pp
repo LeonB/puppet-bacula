@@ -34,6 +34,11 @@ class bacula::client::config inherits bacula::config {
     order   => 4,
   }
 
+  # if laptop_mode_tools is installed: disable bacula client when on battery
+  if defined(laptop_mode_tools::control_service) {
+    laptop_mode_tools::control_service { 'bacula-fd': }
+  }
+
   # collect exported resources
   # Bacula::Client::Director <<||>>
 
